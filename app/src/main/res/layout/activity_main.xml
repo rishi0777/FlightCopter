@@ -1,18 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/main_background"
+        android:scaleType="centerCrop"
+        ></ImageView>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <RelativeLayout
+        android:id="@+id/button_back"
+        android:layout_marginTop="70dp"
+        android:layout_width="220sp"
+        android:layout_height="250dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/button_back"
+        >
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:id="@+id/play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/custom_button"
+            android:fontFamily="@font/aladin"
+            android:layout_marginTop="15sp"
+            android:text="PLAY"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"></Button>
+
+        <Button
+            android:id="@+id/highscore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/play"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10sp"
+            android:background="@drawable/custom_button"
+            android:fontFamily="@font/aladin"
+            android:text="HIGHSCORE"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"></Button>
+
+        <Button
+            android:id="@+id/about"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/highscore"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10sp"
+            android:background="@drawable/custom_button"
+            android:fontFamily="@font/aladin"
+            android:text="ABOUT"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"></Button>
+
+        <Button
+            android:id="@+id/exit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/about"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10sp"
+            android:background="@drawable/custom_button"
+            android:fontFamily="@font/aladin"
+            android:text="EXIT"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"></Button>
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/vol_ctrl"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_margin="16dp"
+        android:layout_alignParentBottom="true"
+        android:src="@drawable/ic_baseline_volume_up_24"
+        android:background="@drawable/custom_button">
+
+    </ImageView>
+</RelativeLayout>
