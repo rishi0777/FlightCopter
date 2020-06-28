@@ -9,8 +9,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".NameScreen" android:theme="@style/AppTheme.noTitleBar"
-            android:screenOrientation="landscape"></activity>
+        <activity android:name=".Stage1Activity"></activity>
+        <activity
+            android:name=".NameScreen"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme.noTitleBar" />
         <activity
             android:name=".HighScore"
             android:screenOrientation="landscape"

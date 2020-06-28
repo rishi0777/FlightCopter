@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".NameScreen">
+<com.airbnb.lottie.LottieAnimationView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:lottie_loop="true"
+    app:lottie_fileName="2background.json"
+    app:lottie_autoPlay="true"
+    android:scaleType="fitXY">
+</com.airbnb.lottie.LottieAnimationView>
+    <RelativeLayout
+    android:id="@+id/box"
+    android:layout_width="250sp"
+    android:layout_height="260sp"
+        android:layout_marginTop="100sp"
+        android:layout_centerVertical="true"
+    android:layout_centerHorizontal="true">
+    <TextView
+        android:id="@+id/enter_text"
+        android:layout_width="100sp"
+        android:layout_height="60sp"
+        android:layout_marginLeft="10sp"
+        android:textSize="20sp"
+        android:fontFamily="@font/bangers"
+        android:text="Name"
+        android:textColor="#FFFFFF"
+        android:textAlignment="center"
+        android:gravity="center"></TextView>
+    <EditText
+        android:id="@+id/write_name"
+        android:layout_width="100sp"
+        android:layout_height="60sp"
+        android:layout_toRightOf="@+id/enter_text"
+        android:layout_marginLeft="30sp"
+        android:textSize="15sp"
+        android:textColor="#FFFFFF"
+        android:fontFamily="@font/bangers"
+        android:maxLength="5"></EditText>
+
+    <ImageView
+        android:id="@+id/stage1"
+        android:layout_marginTop="20sp"
+        android:layout_width="100sp"
+        android:layout_height="100sp"
+        android:layout_below="@+id/enter_text"
+        android:layout_marginLeft="10sp"
+        android:layout_centerVertical="true"
+        android:src="@drawable/button_back_stage_1"
+        ></ImageView>
+    <ImageView
+        android:id="@+id/stage2"
+        android:layout_toRightOf="@+id/stage1"
+        android:layout_marginTop="20sp"
+        android:layout_width="100sp"
+        android:layout_height="100sp"
+        android:layout_marginLeft="30sp"
+        android:layout_below="@+id/write_name"
+        android:layout_centerVertical="true"
+        android:src="@drawable/button_back_stage_2"
+        ></ImageView>
+        <TextView
+            android:id="@+id/label_stage1"
+            android:layout_width="wrap_content"
+            android:layout_height="40sp"
+            android:layout_below="@id/stage1"
+            android:layout_marginTop="20sp"
+            android:layout_marginLeft="40sp"
+            android:text="STAGE 1"
+            android:fontFamily="@font/bangers"
+            android:textSize="20sp"></TextView>
+        <TextView
+            android:id="@+id/label_stage2"
+            android:layout_width="wrap_content"
+            android:layout_height="40sp"
+            android:layout_below="@id/stage2"
+            android:layout_marginTop="20sp"
+            android:layout_marginLeft="75sp"
+            android:text="STAGE 2"
+            android:layout_toRightOf="@+id/label_stage1"
+            android:fontFamily="@font/bangers"
+            android:textSize="20sp"></TextView>
+
+
+</RelativeLayout>
+
+</RelativeLayout>

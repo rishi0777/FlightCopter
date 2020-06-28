@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <stroke android:color="@color/buttoncolor_start" android:width="5sp">
+    </stroke>
+    <corners android:radius="999sp">
+    </corners>
+    <size android:width="100sp" android:height="100sp"></size>
+
+</shape>
