@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
     private boolean isPressed = false;
     private boolean isMute = false;
     private SoundPool soundPool;
-    private Toast toast;
     private MediaPlayer mediaPlayer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,15 +44,19 @@ public class MainActivity extends AppCompatActivity {
         } else {
             soundPool = new SoundPool(2, AudioManager.STREAM_MUSIC, 0);
         }
-        final int sound1 = soundPool.load(this, R.raw.button_press, 1);
 
-        toast = Toast.makeText(this, "You Already Pressed One Button", Toast.LENGTH_SHORT);
+        final Toast toast = Toast.makeText(this, "You Already Pressed One Button", Toast.LENGTH_SHORT);
         final Animation shake = AnimationUtils.loadAnimation(MainActivity.this, R.anim.shake);
         final Animation shake_b = AnimationUtils.loadAnimation(MainActivity.this, R.anim.shake_back);
         final Handler handler = new Handler();
 
-
+        final int sound1 = soundPool.load(this, R.raw.button_press, 1);
         final SharedPreferences pref = getSharedPreferences("Game", MODE_PRIVATE);
+        final SharedPreferences.Editor editor = pref.edit();
+
+        //editor.clear();
+        //editor.apply();
+
         final ImageView vol_ctrl = findViewById(R.id.vol_ctrl);
         isMute = pref.getBoolean("isMute", false);
 
@@ -81,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
                     start_Player();
                 }
 
-                SharedPreferences.Editor editor = pref.edit();
                 editor.putBoolean("isMute", isMute);
                 editor.apply();
             }
@@ -93,15 +95,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!isPressed) {
+                    findViewById(R.id.button_box).startAnimation(shake_b);
                     isPressed = true;
                     if (!isMute) {
                         soundPool.play(sound1, 1, 1, 1, 0, 1);
                         stop_Player();
                     }
-                    else{
-
-                    }
-                    findViewById(R.id.button_back).startAnimation(shake_b);
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            finish();
+                            startActivity(new Intent(MainActivity.this,NameScreen.class));
+                        }
+                    },1275);
 
 
                 }
@@ -191,6 +197,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+
+
     private void start_Player(){
         if(mediaPlayer==null){
             mediaPlayer=MediaPlayer.create(this,R.raw.background);
@@ -198,7 +207,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
                 stop_Player();
-                toast.show();
                 start_Player();
             }
         });
@@ -228,5 +236,13 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         finish();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(!isMute) {
+            start_Player();
+        }
     }
 }

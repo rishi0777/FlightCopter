@@ -26,30 +26,26 @@
         app:lottie_loop="true"
         android:background="#151515">
     </com.airbnb.lottie.LottieAnimationView>
-    <TableLayout
-        android:layout_below="@+id/trophy"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    <TableRow
-        android:id="@+id/row1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50sp">
+   <RelativeLayout
+       android:layout_marginTop="30sp"
+       android:layout_below="@+id/trophy"
+       android:layout_width="220sp"
+       android:layout_height="210sp"
+       android:layout_centerInParent="true">
 
     <TextView
         android:id="@+id/name1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="60sp"
+        android:layout_height="30sp"
         android:fontFamily="@font/bangers"
         android:text="Name 1"
-        android:layout_marginLeft="320sp"
         android:textColor="#FFFFFF"
         android:textSize="20sp"></TextView>
 
         <TextView
             android:id="@+id/score1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="60sp"
+            android:layout_height="30sp"
             android:layout_toRightOf="@+id/name1"
             android:fontFamily="@font/bangers"
             android:textSize="20sp"
@@ -57,92 +53,81 @@
             android:text="Score 1"
             android:textColor="#FFFFFF"
             ></TextView>
-    </TableRow>
-        <TableRow
-            android:id="@+id/row2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20sp">
+
 
             <TextView
                 android:id="@+id/name2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="60sp"
+                android:layout_height="30sp"
                 android:fontFamily="@font/bangers"
+                android:layout_below="@id/name1"
+                android:layout_marginTop="30sp"
                 android:text="Name 2"
-                android:layout_marginLeft="320sp"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp"></TextView>
 
             <TextView
                 android:id="@+id/score2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="60sp"
+                android:layout_height="30sp"
                 android:layout_toRightOf="@+id/name1"
                 android:fontFamily="@font/bangers"
                 android:textSize="20sp"
+                android:layout_marginTop="30sp"
+                android:layout_below="@id/score1"
                 android:layout_marginLeft="100sp"
                 android:text="Score 2"
                 android:textColor="#FFFFFF"
                 ></TextView>
-        </TableRow>
 
-        <TableRow
-            android:id="@+id/row3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20sp">
 
-            <TextView
-                android:id="@+id/name3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/bangers"
-                android:text="Name 3"
-                android:layout_marginLeft="320sp"
-                android:textColor="#FFFFFF"
-                android:textSize="20sp"></TextView>
+       <TextView
+           android:id="@+id/name3"
+           android:layout_width="60sp"
+           android:layout_height="30sp"
+           android:fontFamily="@font/bangers"
+           android:layout_below="@id/name2"
+           android:layout_marginTop="30sp"
+           android:text="Name 3"
+           android:textColor="#FFFFFF"
+           android:textSize="20sp"></TextView>
 
-            <TextView
-                android:id="@+id/score3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/name1"
-                android:fontFamily="@font/bangers"
-                android:textSize="20sp"
-                android:layout_marginLeft="100sp"
-                android:text="Score 3"
-                android:textColor="#FFFFFF"
-                ></TextView>
-        </TableRow>
-        <TableRow
-            android:id="@+id/row4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20sp">
+       <TextView
+           android:id="@+id/score3"
+           android:layout_width="60sp"
+           android:layout_height="30sp"
+           android:layout_toRightOf="@+id/name1"
+           android:fontFamily="@font/bangers"
+           android:textSize="20sp"
+           android:layout_marginTop="30sp"
+           android:layout_below="@id/score2"
+           android:layout_marginLeft="100sp"
+           android:text="Score 3"
+           android:textColor="#FFFFFF"
+           ></TextView>
+       <TextView
+           android:id="@+id/cur_user"
+           android:layout_width="50sp"
+           android:layout_height="30sp"
+           android:fontFamily="@font/bangers"
+           android:layout_below="@id/name3"
+           android:layout_marginTop="30sp"
+           android:text="Cur_User"
+           android:textColor="#FFFFFF"
+           android:textSize="20sp"></TextView>
 
-            <TextView
-                android:id="@+id/cur_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/bangers"
-                android:text="Current"
-                android:layout_marginLeft="320sp"
-                android:textColor="#FFFFFF"
-                android:textSize="20sp"></TextView>
-
-            <TextView
-                android:id="@+id/cur_score"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/name1"
-                android:fontFamily="@font/bangers"
-                android:textSize="20sp"
-                android:layout_marginLeft="100sp"
-                android:text="Curr_Score"
-                android:textColor="#FFFFFF"
-                ></TextView>
-        </TableRow>
-
-    </TableLayout>
+       <TextView
+           android:id="@+id/cur_score"
+           android:layout_width="60sp"
+           android:layout_height="30sp"
+           android:layout_toRightOf="@+id/name1"
+           android:fontFamily="@font/bangers"
+           android:textSize="20sp"
+           android:layout_marginTop="30sp"
+           android:layout_below="@id/score3"
+           android:layout_marginLeft="100sp"
+           android:text="Cur_Score"
+           android:textColor="#FFFFFF"
+           ></TextView>
+   </RelativeLayout>
 </RelativeLayout>
