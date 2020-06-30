@@ -39,11 +39,11 @@ public class HighScore extends AppCompatActivity {
        name1.setText(pref.getString("d_name1","-"));
        name2.setText(pref.getString("d_name2","-"));
        name3.setText(pref.getString("d_name3","-"));
-       score1.setText(pref.getString("score1","-"));
-       score2.setText(pref.getString("score2","-"));
-       score3.setText(pref.getString("score3","-"));
+       score1.setText(String.valueOf(pref.getInt("score1",0)));
+       score2.setText(String.valueOf(pref.getInt("score2",0)));
+       score3.setText(String.valueOf(pref.getInt("score3",0)));
        current_name.setText(pref.getString("Last_User_Name","-"));
-       current_score.setText(pref.getString("Last_User_Score","-"));
+       current_score.setText(String.valueOf(pref.getInt("Last_User_Score",0)));
 
 
     }

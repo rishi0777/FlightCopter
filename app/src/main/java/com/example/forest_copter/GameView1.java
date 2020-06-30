@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -14,6 +15,8 @@ import android.os.Build;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 
+
+import androidx.core.content.res.ResourcesCompat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,12 +95,24 @@ public class GameView1 extends SurfaceView implements Runnable {
 
         //Creating object of paint class and then initializing that object into the reference variable of paint class
         paint = new Paint();
-        paint.setTextSize(111);
+        paint.setTextSize(100);
+        //setting font
+        Typeface typeface;
+        if (Build.VERSION.SDK_INT >= 28) {
+            // This does only works from SDK 28 and higher
+            Typeface typefaceA = ResourcesCompat.getFont(activity, R.font.bangers);
+            typeface = Typeface.create(typefaceA, 700, false);
+        } else {
+            // This always works (Whole name without .ttf)
+            typeface = ResourcesCompat.getFont(activity, R.font.bangers);
+        }
+        paint.setTypeface(typeface);
         paint.setColor(Color.BLACK);
 
         //Creating object of random class and then initializing that object into the reference variable of random class
         random = new Random();
 
+        //Creating 4 objects of bird that will be displayed at a time on the screen
         birds = new Bird[4];
         String st1_bird1[]={"st1_bird1_1","st1_bird1_2"};
         String st1_bird2[]={"st1_bird2_1","st1_bird2_2","st1_bird2_3","st1_bird2_4"};
@@ -114,23 +129,18 @@ public class GameView1 extends SurfaceView implements Runnable {
                 bird = new Bird(activity, getResources(), st1_bird2);
             }
             birds[i] = bird;
+
         }
-
-
-
     }
 
     @Override
     public void run() {
 
         while (isPlaying) {
-
             update ();
             draw ();
             sleep ();
-
         }
-
     }
 
     private void update () {
@@ -183,7 +193,7 @@ public class GameView1 extends SurfaceView implements Runnable {
         //placing bird on the screen when it goes off the screen and checking if bird intersects with the flight or not
         for (Bird bird : birds) {
             bird.x -= bird.speed;
-            if (bird.x  < 0) {
+            if (bird.x < 0) {
                 if (!bird.wasShot) {
                     isGameOver = true;
                     return;
@@ -195,7 +205,7 @@ public class GameView1 extends SurfaceView implements Runnable {
                 if (bird.speed < 10 * screenRatioX)
                     bird.speed = (int) (10 * screenRatioX);
 
-                bird.x = screenX;
+                bird.x = screenX+bird.width;
                 bird.y = random.nextInt(screenY - bird.height);
 
                 bird.wasShot = false;
@@ -204,6 +214,7 @@ public class GameView1 extends SurfaceView implements Runnable {
             if (Rect.intersects(bird.getCollisionShape(), flight.getCollisionShape())) {
 
                 isGameOver = true;
+                bird.bird_got_hit_with_flight=true;
                 return;
             }
 
@@ -219,21 +230,30 @@ public class GameView1 extends SurfaceView implements Runnable {
             canvas.drawBitmap(background1.stage1_background, background1.x, background1.y, paint);
             canvas.drawBitmap(background2.stage1_background, background2.x, background2.y, paint);
 
-            for (Bird bird : birds)
-                canvas.drawBitmap(bird.getBird(), bird.x, bird.y, paint);
-
-            canvas.drawText(score + "", screenX / 2f, 164, paint);
+            canvas.drawText(score + "", screenX -120, 120, paint);
 
             if (isGameOver) {
+                for (Bird bird : birds){
+                    if (!bird.bird_got_hit_with_flight)
+                        canvas.drawBitmap(bird.getBird(), bird.x, bird.y, paint);
+                    else{
+                        canvas.drawBitmap(bird.getdead(), bird.x, bird.y, paint);
+                    }
+
+                }
                 isPlaying = false;
                 if(!isMute)
                     soundPool.play(game_Over_Sound,1,1,1,0,1);
                 canvas.drawBitmap(flight.getDead(), flight.x, flight.y, paint);
                 canvas.drawBitmap(gameOver.gameover, gameOver.x, gameOver.y, paint);
                 getHolder().unlockCanvasAndPost(canvas);
-                //saveIfHighScore();
+                saveIfHighScore();
                 waitBeforeExiting ();
                 return;
+            }
+            else{
+                for (Bird bird : birds)
+                    canvas.drawBitmap(bird.getBird(), bird.x, bird.y, paint);
             }
 
             canvas.drawBitmap(flight.getFlight(), flight.x, flight.y, paint);
@@ -260,13 +280,27 @@ public class GameView1 extends SurfaceView implements Runnable {
     }
 
     private void saveIfHighScore() {
-
-       /* if (prefs.getInt("highscore", 0) < score) {
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putInt("highscore", score);
+        String username=prefs.getString("Temp_User_Name","");
+        if (prefs.getInt("score1", 0) <= score) {
+            editor.putString("d_name1",username);
+            editor.putInt("score1", score);
             editor.apply();
         }
-*/
+        else if (prefs.getInt("score2", 0) <= score) {
+            editor.putString("d_name2",username);
+            editor.putInt("score2", score);
+            editor.apply();
+        }
+        else if (prefs.getInt("score3", 0) <= score) {
+            editor.putString("d_name3",username);
+            editor.putInt("score3", score);
+            editor.apply();
+        }
+        else{
+            editor.putString("Last_User_Name",username);
+            editor.putInt("Last_User_Score", score);
+            editor.apply();
+        }
     }
 
     private void sleep () {

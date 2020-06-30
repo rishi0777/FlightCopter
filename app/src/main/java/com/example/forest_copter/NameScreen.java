@@ -71,7 +71,7 @@ public class NameScreen extends AppCompatActivity {
                     toast1.show();
                 }
                   else{
-                      editor.putString("Last_User_Name",is_name_entered);
+                      editor.putString("Temp_User_Name",is_name_entered);
                       editor.apply();
                       if (!isPressed) {
                         view.startAnimation(shake);
@@ -109,7 +109,7 @@ public class NameScreen extends AppCompatActivity {
                     if (!isPressed) {
                         view.startAnimation(shake);
                         findViewById(R.id.label_stage2).startAnimation(shake);
-                        editor.putString("Last_User_Name",is_name_entered);
+                        editor.putString("Temp_User_Name",is_name_entered);
                         editor.apply();
 
                         isPressed = true;
