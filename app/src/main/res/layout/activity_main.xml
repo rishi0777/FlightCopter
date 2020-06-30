@@ -74,7 +74,7 @@
     </RelativeLayout>
 
     <ImageView
-        android:id="@+id/vol_ctrl"
+        android:id="@+id/vol_control"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_margin="16dp"

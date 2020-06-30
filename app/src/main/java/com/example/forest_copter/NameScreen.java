@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ public class NameScreen extends AppCompatActivity {
     private boolean isMute;
     private String is_name_entered;
     private Handler handler;
+    private MediaPlayer mediaPlayer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +35,9 @@ public class NameScreen extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
+
+
 
         SharedPreferences pref=getSharedPreferences("Game",MODE_PRIVATE);
         isMute=pref.getBoolean("isMute",false);
@@ -51,7 +56,7 @@ public class NameScreen extends AppCompatActivity {
             soundPool = new SoundPool(2, AudioManager.STREAM_MUSIC, 0);
         }
 
-        sound1=soundPool.load(this,R.raw.button_press,1);
+        sound1=soundPool.load(this,R.raw.button_press_music,1);
 
         shake= AnimationUtils.loadAnimation(NameScreen.this,R.anim.shake);
         final EditText editText=findViewById(R.id.write_name);
@@ -73,13 +78,14 @@ public class NameScreen extends AppCompatActivity {
                         findViewById(R.id.label_stage1).startAnimation(shake);
                         isPressed = true;
                         if (!isMute) {
+                            stop_Player();
                             soundPool.play(sound1, 1, 1, 1, 0, 1);
                         }
                         handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
                                 finish();
-                                startActivity(new Intent(NameScreen.this,HighScore.class));
+                                startActivity(new Intent(NameScreen.this,Stage1Activity.class));
 
                             }
                         }, 1275);
@@ -108,6 +114,7 @@ public class NameScreen extends AppCompatActivity {
 
                         isPressed = true;
                         if (!isMute) {
+                            stop_Player();
                             soundPool.play(sound1, 1, 1, 1, 0, 1);
                         }
                         handler.postDelayed(new Runnable() {
@@ -141,5 +148,57 @@ public class NameScreen extends AppCompatActivity {
         });
 
 
+    }
+
+    private void start_Player(){
+        if(mediaPlayer==null){
+            mediaPlayer=MediaPlayer.create(this,R.raw.about_background);
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    stop_Player();
+                    start_Player();
+                }
+            });
+        }
+        mediaPlayer.start();
+    }
+
+    private void pause_Player(){
+        if(mediaPlayer!=null) {
+            mediaPlayer.pause();
+        }
+    }
+    private void stop_Player(){
+        if (mediaPlayer!=null){
+            mediaPlayer.release();
+            mediaPlayer=null;
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(!isMute) {
+            start_Player();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(!isMute) {
+            pause_Player();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if(!isMute) {
+            stop_Player();
+        }
+        finish();
+        startActivity(new Intent(NameScreen.this,MainActivity.class));
     }
 }

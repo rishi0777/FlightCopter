@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -11,7 +12,8 @@ import android.widget.TextView;
 
 public class HighScore extends AppCompatActivity {
 
-
+    private MediaPlayer mediaPlayer;
+    private Boolean isMute;
 
 
     @Override
@@ -22,6 +24,7 @@ public class HighScore extends AppCompatActivity {
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
         SharedPreferences pref=getSharedPreferences("Game",MODE_PRIVATE);
+        isMute=pref.getBoolean("isMute",false);
        SharedPreferences.Editor editor=pref.edit();
 
        TextView name1=findViewById(R.id.name1);
@@ -45,11 +48,55 @@ public class HighScore extends AppCompatActivity {
 
     }
 
+    private void start_Player(){
+        if(mediaPlayer==null){
+            mediaPlayer= MediaPlayer.create(this,R.raw.high_background);
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    stop_Player();
+                    start_Player();
+                }
+            });
+        }
+        mediaPlayer.start();
+    }
+
+    private void pause_Player(){
+        if(mediaPlayer!=null) {
+            mediaPlayer.pause();
+        }
+    }
+    private void stop_Player(){
+        if (mediaPlayer!=null){
+            mediaPlayer.release();
+            mediaPlayer=null;
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(!isMute) {
+            start_Player();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(!isMute) {
+            pause_Player();
+        }
+    }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        if(!isMute) {
+            stop_Player();
+        }
         finish();
         startActivity(new Intent(HighScore.this,MainActivity.class));
     }
-
 }

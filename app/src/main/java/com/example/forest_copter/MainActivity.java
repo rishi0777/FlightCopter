@@ -50,14 +50,14 @@ public class MainActivity extends AppCompatActivity {
         final Animation shake_b = AnimationUtils.loadAnimation(MainActivity.this, R.anim.shake_back);
         final Handler handler = new Handler();
 
-        final int sound1 = soundPool.load(this, R.raw.button_press, 1);
+        final int sound1 = soundPool.load(this, R.raw.button_press_music, 1);
         final SharedPreferences pref = getSharedPreferences("Game", MODE_PRIVATE);
         final SharedPreferences.Editor editor = pref.edit();
 
         //editor.clear();
         //editor.apply();
 
-        final ImageView vol_ctrl = findViewById(R.id.vol_ctrl);
+        final ImageView vol_ctrl = findViewById(R.id.vol_control);
         isMute = pref.getBoolean("isMute", false);
 
         if (isMute) {
@@ -202,14 +202,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void start_Player(){
         if(mediaPlayer==null){
-            mediaPlayer=MediaPlayer.create(this,R.raw.background);
+            mediaPlayer=MediaPlayer.create(this,R.raw.main_background);
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                stop_Player();
-                start_Player();
-            }
-        });
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    stop_Player();
+                    start_Player();
+                }
+            });
         }
         mediaPlayer.start();
     }
