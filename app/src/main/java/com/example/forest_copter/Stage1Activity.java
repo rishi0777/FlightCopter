@@ -1,7 +1,6 @@
 package com.example.forest_copter;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.graphics.Point;
 import android.os.Bundle;
 import android.view.View;
