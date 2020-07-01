@@ -27,10 +27,11 @@ public class GameView1 extends SurfaceView implements Runnable {
     private Thread thread;
 
     private boolean isPlaying, isGameOver = false;
+    private boolean dragon_On_Screen=false;
     private boolean isMute=false;
     private int screenX, screenY, score = 0;
     public static float screenRatioX, screenRatioY;
-    private int shoot_Sound,game_Over_Sound;
+    private int shoot_Sound,game_Over_Sound,bird_Passed_Sound;
 
 
     private SharedPreferences prefs;
@@ -39,6 +40,8 @@ public class GameView1 extends SurfaceView implements Runnable {
     private Random random;
     private Paint paint;
 
+    private Dragon dragon;
+    private Life lifeLine;
     private List<Bullet> bullets;
     private Bird[] birds;
     private Flight flight;
@@ -62,15 +65,16 @@ public class GameView1 extends SurfaceView implements Runnable {
                     .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                     .setUsage(AudioAttributes.USAGE_GAME)
                     .build();
-            soundPool = new SoundPool.Builder()
+            soundPool = new SoundPool.Builder().setMaxStreams(2)
                     .setAudioAttributes(audioAttributes)
                     .build();
 
         }
         else {
-            soundPool = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+            soundPool = new SoundPool(2, AudioManager.STREAM_MUSIC, 0);
         }
         //Loading sound and then saving that reference in to int variables
+        bird_Passed_Sound=soundPool.load(activity,R.raw.bird_passed,1);
         shoot_Sound = soundPool.load(activity, R.raw.bullet_shot_music, 1);
         game_Over_Sound = soundPool.load(activity, R.raw.gameover_music, 1);
 
@@ -111,6 +115,13 @@ public class GameView1 extends SurfaceView implements Runnable {
 
         //Creating object of random class and then initializing that object into the reference variable of random class
         random = new Random();
+        //Creating the object of Life class
+        lifeLine=new Life(getResources());
+
+        //Creating object of dragon class
+        dragon =new Dragon(getResources());
+        dragon.x=screenX-dragon.width;//setting initial position of dragon
+        dragon.y=screenY/2-dragon.height/2;
 
         //Creating 4 objects of bird that will be displayed at a time on the screen
         birds = new Bird[4];
@@ -146,8 +157,8 @@ public class GameView1 extends SurfaceView implements Runnable {
     private void update () {
 
         //updating the position of background
-        background1.x -= 10 ;
-        background2.x -= 10 ;
+        background1.x -= 10;
+        background2.x -= 10;
 
         if (background1.x + background1.stage1_background.getWidth() < 0) {
             background1.x = screenX;
@@ -171,104 +182,98 @@ public class GameView1 extends SurfaceView implements Runnable {
         List<Bullet> trash = new ArrayList<>();
 
         //updating position of bullet and checking if bullet intersects with bird
-        for (Bullet bullet : bullets) {
-            if (bullet.x > screenX)
-                trash.add(bullet);
-            bullet.x += 50 * screenRatioX;
-            for (Bird bird : birds) {
-                if (Rect.intersects(bird.getCollisionShape(),
-                        bullet.getCollisionShape())) {
-                    score++;
-                    bird.x = -500;
-                    bullet.x = screenX + 500;
-                    bird.wasShot = true;
+        if (!dragon_On_Screen) {
+            for (Bullet bullet : bullets) {
+                if (bullet.x > screenX)
+                    trash.add(bullet);
+                bullet.x += 50 * screenRatioX;
+                for (Bird bird : birds) {
+                    if (Rect.intersects(bird.getCollisionShape(),
+                            bullet.getCollisionShape())) {
+                        score++;
+                        if (score > 10) {
+                            dragon_On_Screen = true;
+                        }
+                        bird.x = -500;
+                        bullet.x = screenX + 500;
+                        bird.wasShot = true;
+                    }
+                }
+            }
+        }
+        else {// dragon came on screen
+            for (Bullet bullet : bullets) {
+                if (bullet.x > screenX)
+                    trash.add(bullet);
+                bullet.x += 50 * screenRatioX;
+                if (Rect.intersects(bullet.getCollisionShape(), dragon.getCollisionShape())) {
+                        dragon.health--;
+                        if(dragon.health==0){
+                            //stage_clear();
+                        }
                 }
             }
 
         }
+            for (Bullet bullet : trash)
+                bullets.remove(bullet);
 
-        for (Bullet bullet : trash)
-            bullets.remove(bullet);
+            //placing bird on the screen when it goes off the screen and checking if bird intersects with the flight or not
+            if (!dragon_On_Screen) {
+                for (Bird bird : birds) {
+                    bird.x -= bird.speed;
+                    if (bird.x < 0) {
+                        if (!bird.wasShot) {
+                            lifeLine.chance--;
+                            if (!isMute) {
+                                soundPool.play(bird_Passed_Sound, 1, 1, 1, 0, 1);
+                            }
+                            if (lifeLine.chance == 0) {
+                                isGameOver = true;
+                                return;
+                            }
+                        }
 
-        //placing bird on the screen when it goes off the screen and checking if bird intersects with the flight or not
-        for (Bird bird : birds) {
-            bird.x -= bird.speed;
-            if (bird.x < 0) {
-                if (!bird.wasShot) {
-                    isGameOver = true;
-                    return;
-                }
+                        int bound = (int) (30 * screenRatioX);
+                        bird.speed = random.nextInt(bound);
 
-                int bound = (int) (30 * screenRatioX);
-                bird.speed = random.nextInt(bound);
+                        if (bird.speed < 10 * screenRatioX)
+                            bird.speed = (int) (10 * screenRatioX);
 
-                if (bird.speed < 10 * screenRatioX)
-                    bird.speed = (int) (10 * screenRatioX);
+                        bird.x = screenX + bird.width;
+                        bird.y = random.nextInt(screenY - bird.height);
 
-                bird.x = screenX+bird.width;
-                bird.y = random.nextInt(screenY - bird.height);
-
-                bird.wasShot = false;
-            }
-
-            if (Rect.intersects(bird.getCollisionShape(), flight.getCollisionShape())) {
-
-                isGameOver = true;
-                bird.bird_got_hit_with_flight=true;
-                return;
-            }
-
-        }
-
-    }
-
-    private void draw () {
-
-        if (getHolder().getSurface().isValid()) {
-
-            Canvas canvas = getHolder().lockCanvas();
-            canvas.drawBitmap(background1.stage1_background, background1.x, background1.y, paint);
-            canvas.drawBitmap(background2.stage1_background, background2.x, background2.y, paint);
-
-            canvas.drawText(score + "", screenX -120, 120, paint);
-
-            if (isGameOver) {
-                for (Bird bird : birds){
-                    if (!bird.bird_got_hit_with_flight)
-                        canvas.drawBitmap(bird.getBird(), bird.x, bird.y, paint);
-                    else{
-                        canvas.drawBitmap(bird.getdead(), bird.x, bird.y, paint);
+                        bird.wasShot = false;
                     }
 
+                    if (Rect.intersects(bird.getCollisionShape(), flight.getCollisionShape())) {
+                        isGameOver = true;
+                        bird.bird_got_hit_with_flight = true;
+                        return;
+                    }
                 }
-                isPlaying = false;
-                if(!isMute)
-                    soundPool.play(game_Over_Sound,1,1,1,0,1);
-                canvas.drawBitmap(flight.getDead(), flight.x, flight.y, paint);
-                canvas.drawBitmap(gameOver.gameover, gameOver.x, gameOver.y, paint);
-                getHolder().unlockCanvasAndPost(canvas);
-                saveIfHighScore();
-                waitBeforeExiting ();
-                return;
+            } else {//dragon came on screen
+                boolean going_up=true;
+                if(dragon.y>=screenY-dragon.height){
+                    dragon.y = screenY - dragon.height;
+                }
+
+                if (dragon.y < 0){
+                    dragon.y = 0;
+                }
+
+                if(flight.isGoingUp){
+                    dragon.y-=30*screenRatioY;
+                }
+                else{
+                    dragon.y+=30*screenRatioY;
+                }
+
             }
-            else{
-                for (Bird bird : birds)
-                    canvas.drawBitmap(bird.getBird(), bird.x, bird.y, paint);
-            }
-
-            canvas.drawBitmap(flight.getFlight(), flight.x, flight.y, paint);
-
-            for (Bullet bullet : bullets)
-                canvas.drawBitmap(bullet.bullet, bullet.x, bullet.y, paint);
-
-            getHolder().unlockCanvasAndPost(canvas);
 
         }
 
-    }
-
-    private void waitBeforeExiting() {
-
+    private void stage_clear() {
         try {
             Thread.sleep(3000);
             activity.startActivity(new Intent(activity, MainActivity.class));
@@ -276,95 +281,195 @@ public class GameView1 extends SurfaceView implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 
-    private void saveIfHighScore() {
-        String username=prefs.getString("Temp_User_Name","");
-        if (prefs.getInt("score1", 0) <= score) {
-            editor.putString("d_name1",username);
-            editor.putInt("score1", score);
-            editor.apply();
+    private void draw () {
+
+            if (getHolder().getSurface().isValid()) {
+
+                Canvas canvas = getHolder().lockCanvas();
+
+                //drawing background
+                canvas.drawBitmap(background1.stage1_background, background1.x, background1.y, paint);
+                canvas.drawBitmap(background2.stage1_background, background2.x, background2.y, paint);
+
+                //drawing lifelines
+                if (lifeLine.chance == 3) {
+                    canvas.drawBitmap(lifeLine.lifelines(), lifeLine.x, lifeLine.y, paint);
+                    canvas.drawBitmap(lifeLine.lifelines(), lifeLine.x + lifeLine.width, lifeLine.y, paint);
+                    canvas.drawBitmap(lifeLine.lifelines(), lifeLine.x + 2 * lifeLine.width, lifeLine.y, paint);
+                } else if (lifeLine.chance == 2) {
+                    canvas.drawBitmap(lifeLine.lifelines(), lifeLine.x, lifeLine.y, paint);
+                    canvas.drawBitmap(lifeLine.lifelines(), lifeLine.x + lifeLine.width, lifeLine.y, paint);
+                } else if (lifeLine.chance == 1) {
+                    canvas.drawBitmap(lifeLine.lifelines(), lifeLine.x, lifeLine.y, paint);
+                }
+
+                if(!dragon_On_Screen) {///dragon is not on screen
+                    //drawing score
+                    canvas.drawText(score + "", screenX - 120, 120, paint);
+
+                    //drawing birds
+                    if (isGameOver) {
+                        for (Bird bird : birds) {
+                            if (!bird.bird_got_hit_with_flight)
+                                canvas.drawBitmap(bird.getBird(), bird.x, bird.y, paint);
+                            else {
+                                canvas.drawBitmap(bird.getdead(), bird.x, bird.y, paint);
+                            }
+
+                        }
+                        isPlaying = false;
+                        if (!isMute)
+                            soundPool.play(game_Over_Sound, 1, 1, 1, 0, 1);
+                        canvas.drawBitmap(flight.getDead(), flight.x, flight.y, paint);
+                        canvas.drawBitmap(gameOver.gameover, gameOver.x, gameOver.y, paint);
+                        getHolder().unlockCanvasAndPost(canvas);
+                        saveIfHighScore();
+                        waitBeforeExiting();
+                        return;
+                    } else {
+                        for (Bird bird : birds)
+                            canvas.drawBitmap(bird.getBird(), bird.x, bird.y, paint);
+                    }
+                }
+                else{
+                    canvas.drawBitmap(dragon.getDragon(),dragon.x,dragon.y,paint);
+                }
+                //drawing flight
+                canvas.drawBitmap(flight.getFlight(), flight.x, flight.y, paint);
+
+                //drawing bullets
+                for (Bullet bullet : bullets)
+                    canvas.drawBitmap(bullet.bullet, bullet.x, bullet.y, paint);
+
+                getHolder().unlockCanvasAndPost(canvas);
+
+            }
+
         }
-        else if (prefs.getInt("score2", 0) <= score) {
-            editor.putString("d_name2",username);
-            editor.putInt("score2", score);
-            editor.apply();
+
+        private void waitBeforeExiting () {
+
+            try {
+                Thread.sleep(3000);
+                activity.startActivity(new Intent(activity, MainActivity.class));
+                activity.finish();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
         }
-        else if (prefs.getInt("score3", 0) <= score) {
-            editor.putString("d_name3",username);
-            editor.putInt("score3", score);
-            editor.apply();
-        }
-        else{
-            editor.putString("Last_User_Name",username);
+
+        private void saveIfHighScore () {
+            String username = prefs.getString("Temp_User_Name", "");
+
+            if (prefs.getInt("score1", 0) <= score) {
+
+                String name1 = prefs.getString("d_name1", "-");
+                int score1 = prefs.getInt("score1", 0);
+                String name2 = prefs.getString("d_name2", "-");
+                int score2 = prefs.getInt("score2", 0);
+
+                editor.putString("d_name1", username);
+                editor.putInt("score1", score);
+                editor.apply();
+
+                if (prefs.getInt("score2", 0) <= score1) {
+                    editor.putString("d_name2", name1);
+                    editor.putInt("score2", score1);
+                    editor.apply();
+                }
+                if (prefs.getInt("score3", 0) <= score2) {
+                    editor.putString("d_name3", name2);
+                    editor.putInt("score3", score2);
+                    editor.apply();
+                }
+            } else if (prefs.getInt("score2", 0) <= score) {
+                String name2 = prefs.getString("d_name2", "-");
+                int score2 = prefs.getInt("score2", 0);
+                editor.putString("d_name2", username);
+                editor.putInt("score2", score);
+                editor.apply();
+
+                if (prefs.getInt("score3", 0) <= score2) {
+                    editor.putString("d_name3", name2);
+                    editor.putInt("score3", score2);
+                    editor.apply();
+                }
+            } else if (prefs.getInt("score3", 0) <= score) {
+                editor.putString("d_name3", username);
+                editor.putInt("score3", score);
+                editor.apply();
+            }
+
+            editor.putString("Last_User_Name", username);
             editor.putInt("Last_User_Score", score);
             editor.apply();
-        }
-    }
 
-    private void sleep () {
-        try {
-            Thread.sleep(17);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void resume () {
-
-        isPlaying = true;
-        thread = new Thread(this);
-        thread.start();
-
-    }
-
-    public void pause () {
-
-        try {
-            isPlaying = false;
-            thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
 
-    }
+        private void sleep () {
+            try {
+                Thread.sleep(17);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        int count=event.getPointerCount();
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                if (event.getX() < screenX / 2) {
-                    flight.isGoingUp = true;
-                }
-                if (event.getX() > screenX / 2)
-                    flight.toShoot++;
-                break;
+        public void resume () {
 
-            case MotionEvent.ACTION_UP:
-                flight.isGoingUp = false;
-                break;
+            isPlaying = true;
+            thread = new Thread(this);
+            thread.start();
 
-            case MotionEvent.ACTION_POINTER_2_DOWN:
-                if (event.getX(1) < screenX / 2) {
-                    flight.isGoingUp = true;
-                }
-                if (event.getX(1) > screenX / 2) {
-                    flight.toShoot++;
-                }
-                break;
-            case MotionEvent.ACTION_POINTER_2_UP:
-                if (event.getX(1) < screenX / 2) {
+        }
+
+        public void pause () {
+
+            try {
+                isPlaying = false;
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        @Override
+        public boolean onTouchEvent (MotionEvent event){
+            int count = event.getPointerCount();
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    if (event.getX() < screenX / 2) {
+                        flight.isGoingUp = true;
+                    }
+                    if (event.getX() > screenX / 2)
+                        flight.toShoot++;
+                    break;
+
+                case MotionEvent.ACTION_UP:
                     flight.isGoingUp = false;
-                }
+                    break;
 
+                case MotionEvent.ACTION_POINTER_2_DOWN:
+                    if (event.getX(1) < screenX / 2) {
+                        flight.isGoingUp = true;
+                    }
+                    if (event.getX(1) > screenX / 2) {
+                        flight.toShoot++;
+                    }
+                    break;
+                case MotionEvent.ACTION_POINTER_2_UP:
+                    if (event.getX(1) < screenX / 2) {
+                        flight.isGoingUp = false;
+                    }
+
+            }
+
+
+            return true;
         }
-
-
-        return true;
-    }
-
 
     public void newBullet() {
 

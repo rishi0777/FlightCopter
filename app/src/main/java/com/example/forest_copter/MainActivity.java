@@ -29,13 +29,14 @@ public class MainActivity extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
-        setContentView(R.layout.activity_main);
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             AudioAttributes audioAttributes = new AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         final int sound1 = soundPool.load(this, R.raw.button_press_music, 1);
         final SharedPreferences pref = getSharedPreferences("Game", MODE_PRIVATE);
         final SharedPreferences.Editor editor = pref.edit();
+
 
         //editor.clear();
         //editor.apply();

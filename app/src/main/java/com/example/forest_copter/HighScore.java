@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -39,11 +40,12 @@ public class HighScore extends AppCompatActivity {
        name1.setText(pref.getString("d_name1","-"));
        name2.setText(pref.getString("d_name2","-"));
        name3.setText(pref.getString("d_name3","-"));
-       score1.setText(String.valueOf(pref.getInt("score1",0)));
-       score2.setText(String.valueOf(pref.getInt("score2",0)));
-       score3.setText(String.valueOf(pref.getInt("score3",0)));
-       current_name.setText(pref.getString("Last_User_Name","-"));
-       current_score.setText(String.valueOf(pref.getInt("Last_User_Score",0)));
+
+       score1.setText(String.valueOf(pref.getInt("score1", 0)));
+       score2.setText(String.valueOf(pref.getInt("score2", 0)));
+       score3.setText(String.valueOf(pref.getInt("score3", 0)));
+       current_name.setText(pref.getString("Last_User_Name", "-"));
+       current_score.setText(String.valueOf(pref.getInt("Last_User_Score", 0)));
 
 
     }
