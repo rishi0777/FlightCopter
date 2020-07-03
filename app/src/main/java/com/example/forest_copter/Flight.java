@@ -4,7 +4,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
-
+import static com.example.forest_copter.GameView1.screenRatioX;
 
 
 public class Flight {
@@ -35,8 +35,8 @@ public class Flight {
         width=flight1.getWidth();// taking height and width of flights(as flight1 and flight 2 have same size)
         height=flight1.getHeight();//height and width of shoot will also be same since they are also the images of flight
 
-        width/=4;//Reducing the size since size of flights initially are two big
-        height/=4;
+        width/=5;//Reducing the size since size of flights initially are two big
+        height/=5;
 
         //width=(int)(width*screenRatioX); //Making its size compatible to every screen
         //height=(int)(height*screenRatioY);
@@ -54,7 +54,7 @@ public class Flight {
 
         y=(screenY/2)-(height/2);//setting position of flight in middle of y axis
         //x=(int)(64*screenRatioX);//creating some space between extreme right corner and flight.
-        x=64;
+        x= (int) (30*screenRatioX);
 
     }
 
