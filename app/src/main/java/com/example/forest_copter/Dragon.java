@@ -14,8 +14,8 @@ public class Dragon {
         int[] resID;
         int x,y,i;
         private int j=-1;
-        final int max_Health_point=10;
-        int health=10;
+        final int max_Health_point=100;
+        int health=100;
         int width,height;
         Bitmap[] dragon;
 

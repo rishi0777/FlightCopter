@@ -6,5 +6,6 @@
     <color name="buttoncolor_start">#2AF598</color>
     <color name="buttoncolor_mid">#2c3812</color>
     <color name="buttoncolor_end">#003EFD</color>
+    <color name="White">#FFFFFF</color>
 
 </resources>

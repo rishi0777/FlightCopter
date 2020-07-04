@@ -33,14 +33,14 @@
        android:layout_height="260sp"
        android:layout_centerInParent="true">
 
-    <TextView
-        android:id="@+id/name1"
-        android:layout_width="60sp"
-        android:layout_height="30sp"
-        android:fontFamily="@font/bangers"
-        android:text="Name 1"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"></TextView>
+       <TextView
+           android:id="@+id/name1"
+           android:layout_width="60sp"
+           android:layout_height="30sp"
+           android:fontFamily="@font/bangers"
+           android:text="Name 1"
+           android:textColor="#FFFFFF"
+           android:textSize="20sp"></TextView>
 
         <TextView
             android:id="@+id/score1"

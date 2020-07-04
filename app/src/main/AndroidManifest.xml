@@ -9,21 +9,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Stage1Activity"
-            android:theme="@style/AppTheme.noTitleBar"
-            android:screenOrientation="landscape">
+        <activity android:name=".Loading"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme.noTitleBar">
+        </activity>
+        <activity
+            android:name=".Stage1Activity"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme.noTitleBar"></activity>
+        <activity
+            android:name=".NameScreen"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme.noTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".NameScreen"
-            android:screenOrientation="landscape"
-            android:theme="@style/AppTheme.noTitleBar" >
-
-
         </activity>
         <activity
             android:name=".HighScore"
@@ -36,9 +38,7 @@
         <activity
             android:name=".MainActivity"
             android:screenOrientation="landscape"
-            android:theme="@style/AppTheme.noTitleBar">
-
-        </activity>
+            android:theme="@style/AppTheme.noTitleBar"></activity>
 
         <meta-data
             android:name="preloaded_fonts"

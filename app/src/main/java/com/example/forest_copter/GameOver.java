@@ -24,7 +24,7 @@ public class GameOver {
 
         width_stage/=5*screenRatioX;
         height_stage/=5*screenRatioY;
-        width/=3*screenRatioX;
+        width/=4*screenRatioX;
         height/=3*screenRatioY;
         //width=(int)(width*screenRatioX);
         //height=(int)(height*screenRatioX);

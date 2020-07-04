@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Build;
 import android.view.MotionEvent;
@@ -33,18 +34,22 @@ public class GameView1 extends SurfaceView implements Runnable {
     private boolean dragon_On_Screen = false;
     public static boolean dragon_fire_on_screen = false, fire_out_of_mouth = false, dragon_incoming = false;
     private boolean isMute = false;
-    private boolean stageIsClear = false;//initial value false
+    private boolean stageIsClear = false;
+    private boolean is_Stage_Clear_Sound_Played=false,battle_Music_Playing=false;
     private int screenX, screenY, score = 0;
     public static float screenRatioX, screenRatioY;
-    private int shoot_Sound, game_Over_Sound, bird_Passed_Sound, dragon_got_hit_Sound, dragon_fire_on_screen_Sound;
+    private int bullet_Sound, game_Over_Sound, bird_Passed_Sound, dragon_got_hit_Sound, dragon_fire_on_screen_Sound
+            ,stage_clear_sound;
     private int margin = 2;
 
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
     private SoundPool soundPool;
+    private MediaPlayer mediaPlayer;
     private Random random;
     private Paint paint, paint_Health_Color, paint_Health_Border;
 
+    private DragonDead dragon_dead;
     private DragonFire dragonFire;
     private Dragon dragon;
     private Dragon_Incoming dragon_incoming_obj;
@@ -81,10 +86,11 @@ public class GameView1 extends SurfaceView implements Runnable {
         }
         //Loading sound and then saving that reference in to int variables
         bird_Passed_Sound = soundPool.load(activity, R.raw.bird_passed, 1);
-        shoot_Sound = soundPool.load(activity, R.raw.bullet_shot_music, 1);
+        bullet_Sound = soundPool.load(activity, R.raw.bullet_shot_music, 1);
         game_Over_Sound = soundPool.load(activity, R.raw.gameover_music, 1);
-        dragon_got_hit_Sound = soundPool.load(activity, R.raw.dragon_got_hit, 2);
+        dragon_got_hit_Sound = soundPool.load(activity, R.raw.dragon_got_hit, 1);
         dragon_fire_on_screen_Sound = soundPool.load(activity, R.raw.dragon_fire_sound, 1);
+        stage_clear_sound=soundPool.load(activity,R.raw.stage_clear,1);
 
         this.screenX = screenX;
         this.screenY = screenY;
@@ -109,21 +115,22 @@ public class GameView1 extends SurfaceView implements Runnable {
         paint = new Paint();
         paint_Health_Color = new Paint();
         paint_Health_Border = new Paint();
+
+        //setting color of paint object
         paint_Health_Border.setColor(Color.GRAY);
         paint_Health_Color.setColor(Color.RED);
-        paint.setTextSize(100);
-        //setting font
-        Typeface typeface;
-       /* if (Build.VERSION.SDK_INT >= 28) {
-            // This does only works from SDK 28 and higher
-            Typeface typefaceA = ResourcesCompat.getFont(activity, R.font.bangers);
-            typeface = Typeface.create(typefaceA, 700, false);
-        } else {*/
-        // This always works (Whole name without .ttf)
-        typeface = ResourcesCompat.getFont(activity, R.font.bangers);
-        // }
-        paint.setTypeface(typeface);
         paint.setColor(Color.BLACK);
+
+        //setting font of paint object
+        Typeface typeface1, typeface2;
+        typeface1 = ResourcesCompat.getFont(activity, R.font.aladin);
+        typeface2 = ResourcesCompat.getFont(activity, R.font.bangers);
+
+        paint.setTextSize(100);
+        paint_Health_Color.setTextSize(100);
+        paint_Health_Color.setTypeface(typeface1);
+        paint.setTypeface(typeface2);
+
 
         //Creating object of random class and then initializing that object into the reference variable of random class
         random = new Random();
@@ -140,6 +147,9 @@ public class GameView1 extends SurfaceView implements Runnable {
 
         //Creating an object of dragonFire
         dragonFire = new DragonFire(getResources(), dragon.x);
+
+        //Creating ann object of DragonDead
+        dragon_dead=new DragonDead(getResources(),activity);
 
         //Creating 4 objects of bird that will be displayed at a time on the screen
         birds = new Bird[4];
@@ -231,7 +241,7 @@ public class GameView1 extends SurfaceView implements Runnable {
                         if (Rect.intersects(bird.getCollisionShape(),
                                 bullet.getCollisionShape())) {
                             score++;
-                            if (score > 1) {
+                            if (score > 100) {
                                 dragon_incoming = true;
                             }
                             bird.x = -500;
@@ -373,7 +383,7 @@ public class GameView1 extends SurfaceView implements Runnable {
             if (!stageIsClear) {
                 if ((!dragon_On_Screen) && (!dragon_incoming)) {//dragon is not on screen and neither it is coming
                     //drawing score
-                    canvas.drawText(score + "", screenX - 120, 120, paint);
+                    canvas.drawText(score + "", screenX - 200, 120, paint);
 
                     //drawing birds
                     if (isGameOver) {//game gets over
@@ -404,22 +414,32 @@ public class GameView1 extends SurfaceView implements Runnable {
 
                 // dragon is not on screen and is coming
                 else if ((!dragon_On_Screen) && dragon_incoming) {
+                    if(!isMute && !battle_Music_Playing){
+                        start_Player();
+                        battle_Music_Playing=true;
+                    }
                     canvas.drawBitmap(dragon_incoming_obj.dragon_incoming_danger_image, dragon_incoming_obj.x_dr_incoming_danger_image
                             , dragon_incoming_obj.y_dr_incoming_danger_image, paint);
+                    canvas.drawText("DRAGON",dragon_incoming_obj.x_dr_incoming_danger_image-50,dragon_incoming_obj.
+                                    y_dr_incoming_danger_image+dragon_incoming_obj.height+100,paint_Health_Color);
                     canvas.drawBitmap(dragon_incoming_obj.getIncomingDragon(), dragon_incoming_obj.x, dragon_incoming_obj.y, paint);
                 }
 
                 //dragon came on screen
                 else {
+                    //drawing score
+                    canvas.drawText(score + "", screenX - 200, 120, paint);
+
+                    //drawing dragon
                     canvas.drawBitmap(dragon.getDragon(), dragon.x, dragon.y, paint);
 
                     //health bar of dragon
-
                     float percent = (float) dragon.health / dragon.max_Health_point;
-                    canvas.drawRect(20, screenY - 35, dragon.width, screenY - 5, paint_Health_Border);
+                    canvas.drawRect(10, screenY - 35, dragon.width, screenY - 5, paint_Health_Border);
 
                     if (dragon.health != 0) {
-                        canvas.drawRect(20 + 4 * margin, screenY - 35 + 4 * margin, percent * dragon.width - 4 * margin, screenY - 5 - 4 * margin, paint_Health_Color);
+                        canvas.drawRect(10 + 4 * margin, screenY - 35 + 4 * margin,
+                                percent * dragon.width - 4 * margin, screenY - 5 - 4 * margin, paint_Health_Color);
                     } else {
                         stageIsClear = true;
                     }
@@ -447,34 +467,34 @@ public class GameView1 extends SurfaceView implements Runnable {
                     for (Bullet bullet : bullets)
                         canvas.drawBitmap(bullet.bullet, bullet.x, bullet.y, paint);
                 }
-            } else {
-                canvas.drawText(score + "", screenX - 130, 120, paint);
-                //canvas.drawRect(20, screenY - 35, dragon.width, screenY - 5, paint_Health_Border);
-                canvas.drawBitmap(gameOver.stageClear, gameOver.x_stage, gameOver.y_stage, paint);
+            }
 
+            else {//dragon got dead and stage is cleared
+                if(!isMute && battle_Music_Playing){
+                    stop_Player();
+                    battle_Music_Playing=false;
+                }
+                if(!isMute && !is_Stage_Clear_Sound_Played){
+                    soundPool.play(stage_clear_sound,1,1,1,1,1);
+                    is_Stage_Clear_Sound_Played=true;
+                }
+                canvas.drawText(score + "", screenX - 300, 120, paint);
+                canvas.drawRect(20, screenY - 35, dragon.width, screenY - 5, paint_Health_Border);
+                canvas.drawBitmap(gameOver.stageClear, gameOver.x_stage, gameOver.y_stage, paint);
+                canvas.drawBitmap(dragon_dead.getDragonDead(),dragon.x,dragon.y,paint);
             }
             //drawing flight
             canvas.drawBitmap(flight.getFlight(), flight.x, flight.y, paint);
             getHolder().unlockCanvasAndPost(canvas);
-            if (flight.x > screenX + flight.width) {
+
+            if (flight.x > screenX + flight.width) {// when flight gets off of the screen, end the game
                 saveIfHighScore();
                 //isPlaying = false;
                 activity.startActivity(new Intent(activity, MainActivity.class));
                 activity.finish();
             }
         }
-         /*else {//here we draw the image of flight moving in right direction and dragon dying and the image stage_clear
-                canvas.drawRect(0, 0, 0, 0, paint_Health_Color);
-                canvas.drawBitmap(background1.stage1_background, 0, 0, paint);
-                canvas.drawBitmap(gameOver.stageClear, gameOver.x_stage, gameOver.y_stage, paint);
-                getHolder().unlockCanvasAndPost(canvas);
 
-                if (flight.x > screenX + flight.width) {
-
-                    isPlaying = false;
-                    activity.startActivity(new Intent(activity, MainActivity.class));
-                    activity.finish();
-                }*/
     }
 
 
@@ -620,11 +640,36 @@ public class GameView1 extends SurfaceView implements Runnable {
         }
         return true;
     }
+    private void start_Player(){
+        if(mediaPlayer==null){
+            mediaPlayer=MediaPlayer.create(activity,R.raw.battle);
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    stop_Player();
+                    start_Player();
+                }
+            });
+        }
+        mediaPlayer.start();
+    }
+
+    private void pause_Player(){
+        if(mediaPlayer!=null) {
+            mediaPlayer.pause();
+        }
+    }
+    private void stop_Player(){
+        if (mediaPlayer!=null){
+            mediaPlayer.release();
+            mediaPlayer=null;
+        }
+    }
 
     public void newBullet() {
 
         if (!isMute)
-            soundPool.play(shoot_Sound, 1, 1, 0, 0, 1);
+            soundPool.play(bullet_Sound, 1, 1, 1, 0, 1);
 
         Bullet bullet = new Bullet(getResources());
         bullet.x = flight.x + flight.width;
